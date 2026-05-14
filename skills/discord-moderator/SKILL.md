@@ -10,6 +10,9 @@ metadata:
   author: community
   version: "0.1.2"
   category: chat
+  tags:
+    - Community
+  permissions: []
 ---
 
 # Discord Moderator
