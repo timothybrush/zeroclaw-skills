@@ -10,6 +10,9 @@ metadata:
   author: zeroclaw-labs
   version: "0.2.1"
   category: agents
+  tags:
+    - Official
+  permissions: []
 ---
 
 # Multi-Agent Router
