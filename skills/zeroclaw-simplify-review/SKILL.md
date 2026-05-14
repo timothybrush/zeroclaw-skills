@@ -7,6 +7,10 @@ metadata:
   author: zeroclaw-labs
   version: "0.1.0"
   category: coding
+  tags:
+    - Official
+  permissions:
+    - file_read
 ---
 
 # ZeroClaw Simplify Review
