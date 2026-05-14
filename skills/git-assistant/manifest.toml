@@ -1,9 +1,0 @@
-[skill]
-name = "git-assistant"
-version = "0.2.0"
-author = "zeroclaw-labs"
-description = "Smart git operations — interactive rebase, conflict resolution, changelog generation."
-category = "tools"
-tags = ["Official"]
-license = "MIT"
-permissions = []
