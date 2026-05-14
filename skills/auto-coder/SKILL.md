@@ -10,6 +10,13 @@ metadata:
   author: zeroclaw-labs
   version: "0.3.0"
   category: coding
+  tags:
+    - Official
+    - Featured
+  permissions:
+    - file_read
+    - file_write
+    - shell_exec
 ---
 
 # Auto Coder
