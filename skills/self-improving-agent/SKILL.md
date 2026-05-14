@@ -10,6 +10,10 @@ metadata:
   author: community
   version: "0.0.3"
   category: agents
+  tags:
+    - Community
+    - Experimental
+  permissions: []
 ---
 
 # Self-Improving Agent
