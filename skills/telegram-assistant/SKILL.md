@@ -10,6 +10,11 @@ metadata:
   author: zeroclaw-labs
   version: "0.4.0"
   category: chat
+  tags:
+    - Official
+    - Featured
+  permissions:
+    - channel_telegram
 ---
 
 # Telegram Assistant
