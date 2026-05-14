@@ -6,7 +6,7 @@ A skill registry for [ZeroClaw](https://www.zeroclawlabs.ai) — AI agent skills
 
 This registry is **not a vetted security boundary**. CI runs structure validation and pattern-matching scans (secret detection, dangerous-shape regexes, file-policy checks) on every PR. We do **not** audit skill code for security or correctness, and pattern matching does not catch novel or obfuscated misuse. Runtime behavior — network calls, package installs, files written, commands run — is the user's responsibility to evaluate before installing.
 
-Run `zeroclaw skills audit <name>` and read the skill's `SKILL.md` and `manifest.toml` before installing anything you don't recognize.
+Run `zeroclaw skills audit <name>` and read the skill's `SKILL.md` before installing anything you don't recognize.
 
 ## Trust tiers
 
@@ -42,30 +42,13 @@ cd zeroclaw-skills
 
 ```
 skills/my-skill/
-├── manifest.toml   # Required — internal metadata
 ├── SKILL.md        # Required — YAML frontmatter + agent instructions
 └── README.md       # Required — documentation for users
 ```
 
-Your folder name **must** match the `name` field in both `manifest.toml` and the `SKILL.md` frontmatter.
+Your folder name **must** match the `name` field in the `SKILL.md` frontmatter.
 
-### Step 3 — Write `manifest.toml`
-
-```toml
-[skill]
-name = "my-skill"
-version = "0.1.0"
-author = "your-github-username"
-description = "What your skill does in one sentence."
-category = "tools"
-tags = ["Community"]
-license = "MIT"
-permissions = ["file_read"]
-```
-
-**Required fields:** `name`, `version`, `author`, `description`, `category`, `license`
-
-> **About `author = "community"`:** A handful of legacy entries in `registry.json` carry `"community"` as the author. These are placeholder values for skills whose original contributor couldn't be resolved from git history, and they are being phased out as new community-authored skills replace them. New contributions must use a real GitHub login — the placeholder is not accepted for new submissions.
+> **About `author: community`:** A handful of legacy entries in `registry.json` carry `"community"` as the author. These are placeholder values for skills whose original contributor couldn't be resolved from git history, and they are being phased out as new community-authored skills replace them. New contributions must use a real GitHub login — the placeholder is not accepted for new submissions.
 
 #### Categories
 
@@ -100,9 +83,9 @@ Only request what your skill actually needs. Dangerous combinations are blocked 
 
 > **Blocked combos:** `shell_exec` + any network permission, `file_write` + `shell_exec`. These combinations allow arbitrary code execution with data exfiltration and will be rejected automatically.
 
-### Step 4 — Write `SKILL.md`
+### Step 3 — Write `SKILL.md`
 
-`SKILL.md` must start with YAML frontmatter followed by the agent instructions. This follows the [agentskills.io specification](https://agentskills.io/specification).
+`SKILL.md` is the single source of metadata. It starts with YAML frontmatter followed by the agent instructions, per the [agentskills.io specification](https://agentskills.io/specification).
 
 #### Frontmatter
 
@@ -117,6 +100,10 @@ metadata:
   author: your-github-username
   version: "0.1.0"
   category: tools
+  tags:
+    - Community
+  permissions:
+    - file_read
 ---
 ```
 
@@ -124,8 +111,12 @@ metadata:
 |-------|----------|-------|
 | `name` | Yes | Lowercase, hyphens only. Must match the folder name. Max 64 chars. |
 | `description` | Yes | What it does + when to trigger it. Max 1024 chars. |
-| `license` | No | SPDX identifier or reference to a bundled license file. |
-| `metadata` | No | Arbitrary key-value pairs (author, version, category, etc.). |
+| `license` | Yes | SPDX identifier from the accepted list above. |
+| `metadata.author` | Yes | Your GitHub username (or `community` for legacy entries — see note above). |
+| `metadata.version` | Yes | Semver string, quoted (e.g. `"0.1.0"`). |
+| `metadata.category` | Yes | One of the categories above. |
+| `metadata.tags` | Yes | Trust tier (`Official` / `Community`) plus optional extras like `Featured` or `Experimental`. |
+| `metadata.permissions` | Yes | List of permissions the skill needs. Use `[]` if none. |
 
 #### Instructions body
 
@@ -141,6 +132,10 @@ metadata:
   author: your-github-username
   version: "0.1.0"
   category: tools
+  tags:
+    - Community
+  permissions:
+    - file_read
 ---
 
 # My Skill
@@ -156,7 +151,7 @@ You are a [role]. When given a task:
 - Define the output format
 ```
 
-### Step 5 — Write `README.md`
+### Step 4 — Write `README.md`
 
 Documentation for users browsing the registry. Include:
 
@@ -165,7 +160,7 @@ Documentation for users browsing the registry. Include:
 - What permissions it needs and why
 - Example usage
 
-### Step 6 — Add to `registry.json`
+### Step 5 — Add to `registry.json`
 
 Add an entry to the `skills` array in `registry.json`:
 
@@ -182,7 +177,7 @@ Add an entry to the `skills` array in `registry.json`:
 }
 ```
 
-### Step 7 — Open a pull request
+### Step 6 — Open a pull request
 
 ```bash
 git checkout -b add-my-skill
@@ -200,15 +195,15 @@ Two CI workflows run automatically:
 
 ### Validation (`validate.yml`)
 - `registry.json` is valid JSON
-- Every skill folder has `manifest.toml`, `SKILL.md`, and a non-empty `SKILL.md`
-- All required manifest fields are present
+- Every skill folder has a non-empty `SKILL.md` with valid YAML frontmatter
+- All required frontmatter fields are present (`name`, `description`, `license`, and `metadata.{author,version,category,tags,permissions}`)
 - `license` is a valid SPDX identifier
-- Folder names match manifest `name` fields
+- Folder names match the frontmatter `name` field
 - `registry.json` and `skills/` folders are in sync
 
 ### Security scan (`security-scan.yml`)
 - **Secret detection** — scans for leaked API keys, tokens, and passwords
-- **File policy** — only `.toml`, `.md`, `.json`, `.wasm` files allowed; max 500KB; no symlinks or hidden files
+- **File policy** — only `.md`, `.json`, `.wasm`, `.yml`, `.yaml` files allowed; max 500KB; no symlinks or hidden files
 - **Content scanning** — checks for prompt injection patterns, dangerous shell commands, suspicious URLs, credential leaks, and obfuscated payloads
 - **WASM analysis** — blocks dangerous system imports in `.wasm` binaries
 - **Registry integrity** — validates semver, categories, no path traversal, no external URLs
