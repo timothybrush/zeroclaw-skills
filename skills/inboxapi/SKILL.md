@@ -10,6 +10,11 @@ metadata:
   author: vish-dini
   version: "0.1.0"
   category: chat
+  tags:
+    - Community
+    - InboxAPI
+  permissions:
+    - shell_exec
 ---
 
 # InboxAPI
